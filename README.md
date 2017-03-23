@@ -23,3 +23,23 @@ app.run(debug=True)
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 
 ```
+4. 用了admin中间件，在主目录下__init__.py加入代码，在定义数据库的地方，加入要管理的表
+```
+admin=Admin(app,name="managesystem",template_mode="bootstrap3")
+```
+```
+class UserView(ModelView):
+    # 是否允许创建
+    can_create = False
+    # 显示的字段
+    column_searchable_list = ('username', 'email')
+
+    def is_accessible(self):
+        return is_debug
+
+    def __init__(self, session, **kwargs):
+        super(UserView, self).__init__(User, session, **kwargs)
+
+admin.add_view(UserView(db.session))
+```
+
