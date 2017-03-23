@@ -20,7 +20,7 @@ app.run(debug=True)
 2. moudel目录下放该工程用的的工具
 3. service放服务，业务逻辑都在这里实现，在每个服务下，初始化Blueprint
 ```
-work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
+work_flow = Blueprint('work_flow', __name__, url_pr+efix='/workflow')
 
 ```
 4. 用了admin中间件，在主目录下__init__.py加入代码，在定义数据库的地方，加入要管理的表
