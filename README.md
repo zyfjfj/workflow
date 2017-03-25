@@ -42,4 +42,25 @@ class UserView(ModelView):
 
 admin.add_view(UserView(db.session))
 ```
+5. 要让sqlalchemy创建数据库要在两个地方引用，以workflow为例
+    1. 在workflow包中的wrok_flow.py引入
+    ```
+    import models
 
+    ```
+    2. 在工程__init__.py引入
+    
+    ```
+    from managesys.service.workflow import work_flow
+    ```
+6. [一套完整自定义工作流的实现](http://www.cnblogs.com/walkingp/archive/2010/08/09/1795527.html)
+7. 注意事项
+    1. blueprint中已经有role，自己的role命名成了app_role
+    2. role\models.py中，要加入
+    ```
+    from ..work_flow.models import FlowInfo
+    #为了这个能找到
+    flow_info=db.relationship("FlowInfo")
+
+
+    ```

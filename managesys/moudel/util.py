@@ -5,6 +5,11 @@ from flask import json
 from managesys import db
 
 def objs_to_json(objs):
+    '''
+    将数据库的实体转成json数据
+    :param objs:
+    :return:
+    '''
     if isinstance(objs, list):
         json_obj=[]
         for obj in objs:
@@ -22,3 +27,6 @@ def objs_to_json(objs):
 
 def ok(datas):
     return json.dumps({"status":200,"datas":datas})
+
+def err():
+    return json.dumps({"status":404})

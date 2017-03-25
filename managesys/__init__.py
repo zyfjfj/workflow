@@ -11,12 +11,18 @@ admin=Admin(app,name="managesystem",template_mode="bootstrap3")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root123@127.0.0.1:3306/ftest'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =True
+#加入这些，admin可以增加数据
+app.secret_key = 'workflow'
+app.config['SESSION_TYPE'] = 'filesystem'
+
 db = SQLAlchemy(app)
 #这里要导入蓝图
 from managesys.service.login import login
-from managesys.service.workflow import work_flow
+from managesys.service.role import role
+from managesys.service.work_flow import work_flow
 from managesys.service.screen import models
 #在这里注册buleprint
 app.register_blueprint(login.login)
 app.register_blueprint(work_flow.work_flow)
+app.register_blueprint(role.role)
 db.create_all()
