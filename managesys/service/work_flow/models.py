@@ -49,6 +49,14 @@ class FlowStepInfo(db.Model):
     order_no=db.Column(db.Integer)           #排序号
     def __repr__(self):
         return u'<FlowStepInfo {}>'.format(self.name)
+
+class TranctProc(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
+    step_id=db.Column(db.Integer,db.ForeignKey("flow_step_info.id"))
+    step_action=db.Column(db.Integer)
+    step_time=db.Column(db.DateTime,default=datetime.datetime.now())
+    next_user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
 class FlowView(ModelView):
     # 是否允许创建
     can_create = True
@@ -60,3 +68,4 @@ class FlowView(ModelView):
 admin.add_view(FlowView(FlowInfo,db.session))
 admin.add_view(FlowView(FlowStepInfo,db.session))
 admin.add_view(FlowView(FlowActionInfo,db.session))
+admin.add_view(ModelView(TranctProc,db.session))

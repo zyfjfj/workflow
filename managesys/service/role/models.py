@@ -14,7 +14,7 @@ class Role(db.Model):
     enable=db.Column(db.Boolean,default=True)
 
     def __repr__(self):
-        return '<Role %r>' % self.name
+        return u'<角色 {}>'.format(self.name)
 
 
 admin.add_view(ModelView(Role,db.session))

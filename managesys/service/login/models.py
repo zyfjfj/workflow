@@ -1,21 +1,26 @@
+#!/usr/bin/python
 # coding:utf-8
 from flask_admin.contrib.sqla import ModelView
+from flask_login import UserMixin
+
 from managesys import db, admin,is_debug
 from datetime import datetime
-
-class User(db.Model):
+from ..role.models import Role
+user_role=db.Table('user_role',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
+)
+class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
+    name = db.Column(db.String(80), unique=True)
+    roles=db.relationship('Role', secondary=user_role, backref=db.backref('users',lazy='dynamic'), lazy='dynamic')
     email = db.Column(db.String(120), unique=True)
     create_time = db.Column(db.DateTime)
 
-    def __init__(self, username, email):
-        self.username = username
-        self.email = email
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.name
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,9 +57,9 @@ class Category(db.Model):
 
 class UserView(ModelView):
     # 是否允许创建
-    can_create = False
+    can_create = is_debug
     # 显示的字段
-    column_searchable_list = ('username', 'email')
+    column_searchable_list = ('name', 'email')
 
     def is_accessible(self):
         return is_debug
