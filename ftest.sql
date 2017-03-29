@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : db
-Source Server Version : 50549
-Source Host           : 192.168.0.116:3306
+Source Server         : local
+Source Server Version : 50715
+Source Host           : localhost:3306
 Source Database       : ftest
 
 Target Server Type    : MYSQL
-Target Server Version : 50549
+Target Server Version : 50715
 File Encoding         : 65001
 
-Date: 2017-03-28 18:05:00
+Date: 2017-03-29 21:25:32
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -199,6 +199,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(80) DEFAULT NULL,
   `email` varchar(120) DEFAULT NULL,
+  `password` varchar(30) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`name`),
@@ -208,10 +209,10 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'admin', 'admin@example.com', '2016-12-29 16:36:35');
-INSERT INTO `user` VALUES ('2', 'zyf', '1@1.com', '2016-12-29 16:36:39');
-INSERT INTO `user` VALUES ('3', 'wqs', 'wqs@163.com', '2017-03-28 15:28:00');
-INSERT INTO `user` VALUES ('4', 'hy', 'hy@163.com', '2017-03-28 15:32:00');
+INSERT INTO `user` VALUES ('1', 'admin', 'admin@example.com', '111111', '2016-12-29 16:36:35');
+INSERT INTO `user` VALUES ('2', 'zyf', '1@1.com', '111111', '2016-12-29 16:36:39');
+INSERT INTO `user` VALUES ('3', 'wqs', 'wqs@163.com', '111111', '2017-03-28 15:28:00');
+INSERT INTO `user` VALUES ('4', 'hy', 'hy@163.com', '111111', '2017-03-28 15:32:00');
 
 -- ----------------------------
 -- Table structure for user_role

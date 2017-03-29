@@ -17,11 +17,11 @@ class User(db.Model, UserMixin):
     roles=db.relationship('Role', secondary=user_role, backref=db.backref('users',lazy='dynamic'), lazy='dynamic')
     email = db.Column(db.String(120), unique=True)
     password=db.Column(db.String(30), unique=True)
-    create_time = db.Column(db.DateTime)
+    create_time = db.Column(db.DateTime,default=datetime.now())
 
 
     def __repr__(self):
-        return '<User %r>' % self.name
+        return u'<用户 {}>'.format(self.name)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)

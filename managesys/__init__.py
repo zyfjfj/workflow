@@ -6,10 +6,10 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 is_debug=True
-app = Flask(__name__,static_folder='html',static_url_path='/html')
+app = Flask(__name__,template_folder='html/views',static_folder='html',static_url_path='/html')
 CORS(app, supports_credentials=True)
 admin=Admin(app,name="managesystem",template_mode="bootstrap3")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root123@127.0.0.1:3306/ftest'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:dqpmchtx?@127.0.0.1:3306/ftest'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =True
 #加入这些，admin可以增加数据
@@ -23,7 +23,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 # 声明默认视图函数为login，当我们进行@require_login时，如果没登陆会自动跳到该视图函数处理
-login_manager.login_view = "login"
+login_manager.login_view = "login.login"
 
 db = SQLAlchemy(app)
 #这里要导入蓝图
