@@ -4,8 +4,8 @@ from flask import flash,json
 
 from flask_login import login_user,logout_user
 
-from managesys import login_manager
-from managesys.moudel.util import objs_to_json,ok
+from managesys import login_manager,app
+from managesys.moudel.util import objs_to_json,ok, err
 from models import User
 
 login_bp = Blueprint('login', __name__, url_prefix='/login')
@@ -18,16 +18,15 @@ def load_user(userid):
 @login_bp.route('/',methods=['GET','POST'])
 def index():
     if request.method=="POST":
-        user=json.loads(request.data)
-        user=User.query.filter_by(id=user["id"]).first()
+        #user=json.loads(request.data)
+        email=request.form['email']
+        password=request.form['password']
+        
+        user=User.query.filter_by(email=email,password=password).first()
         if user:
             login_user(user)
             return json.dumps(objs_to_json(user))
         else:
-            return "error"
-    else:
-        users=User.query.all()
-        if users:
-            login_user(users[0])
-            return ok(objs_to_json(users))
-        return 'Hello World!'
+            return err("用户密码错误")
+    elif request.method=="GET":
+        return app.send_static_file('views/login.html')

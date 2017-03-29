@@ -35,5 +35,5 @@ def objs_to_json(objs):
 def ok(datas):
     return json.dumps({"status":200,"datas":datas})
 
-def err():
-    return json.dumps({"status":404})
+def err(datas,status=401):
+    return json.dumps({"status":status,"datas":datas})

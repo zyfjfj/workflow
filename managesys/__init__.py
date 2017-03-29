@@ -4,9 +4,10 @@ from flask import Flask
 from flask_admin import Admin
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_cors import CORS
 is_debug=True
-app = Flask(__name__)
+app = Flask(__name__,static_folder='html',static_url_path='/html')
+CORS(app, supports_credentials=True)
 admin=Admin(app,name="managesystem",template_mode="bootstrap3")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root123@127.0.0.1:3306/ftest'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True

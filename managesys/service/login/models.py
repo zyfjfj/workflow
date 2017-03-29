@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(80), unique=True)
     roles=db.relationship('Role', secondary=user_role, backref=db.backref('users',lazy='dynamic'), lazy='dynamic')
     email = db.Column(db.String(120), unique=True)
+    password=db.Column(db.String(30), unique=True)
     create_time = db.Column(db.DateTime)
 
 
