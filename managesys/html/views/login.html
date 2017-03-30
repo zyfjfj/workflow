@@ -9,32 +9,11 @@
 
     <!-- Site Properties -->
     <title>Login Example - Semantic</title>
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/reset.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/site.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/container.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/grid.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/header.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/image.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/menu.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/divider.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/segment.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/form.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/input.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/button.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/list.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/message.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/icon.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/transition.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/dimmer.css">
-    <link rel="stylesheet" type="text/css" href="../html/semantic/components/modal.css">
+    <link rel="stylesheet" type="text/css" href="../html/semantic/semantic.min.css">
+
 
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="../html/semantic/components/form.js"></script>
-    <script src="../html/semantic/components/dimmer.js"></script>
-    <script src="../html/semantic/components/transition.js"></script>
-    <script src="../html/semantic/components/modal.js"></script>
-    <script src="../html/semantic/components/api.js"></script>
-    <script src="../html/semantic/components/transition.js"></script>
+    <script src="../html/semantic/semantic.min.js"></script>
     <script src="../html/js/jquery.serialize-object.min.js"></script>
 
     <style type="text/css">
@@ -81,19 +60,26 @@
                                 }]
                             }
                         }
-                    }).api({
-                        method: 'POST',
-                        url: 'http://localhost:5000/login/',
-                        serializeForm: true,
-                        data: {
-                            username: "ddddd"
-                        },
-                        onSuccess: function(response) {
-                            // $('.ui.modal')
-                            //     .modal('show');
-                            // console.log(response)
-                        }
                     })
+                    // .api({
+                    //     method: 'POST',
+                    //     url: 'http://localhost:5000/login/',
+                    //     serializeForm: true,
+                    //     data: {
+                    //         username: "ddddd"
+                    //     },
+                    //     onResponse: function(response) {
+                    //         // make some adjustments to response
+
+                //     },
+                //     onSuccess: function(response) {
+                //         window.location.href = "/index";
+                //         return response;
+                //         // $('.ui.modal')
+                //         //     .modal('show');
+                //         // console.log(response)
+                //     }
+                // })
             });
     </script>
 </head>
@@ -126,7 +112,7 @@
                     登录
                 </div>
             </h2>
-            <form class="ui large form">
+            <form class="ui large form" action="http://localhost:5000/login/" method="POST">
                 <div class="ui stacked segment">
                     <div class="field">
                         <div class="ui left icon input">

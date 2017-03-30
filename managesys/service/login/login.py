@@ -1,5 +1,5 @@
 # coding:utf-8
-from flask import Blueprint,request,render_template,redirect,url_for
+from flask import Blueprint,request,render_template,redirect,url_for,session
 from flask import flash,json
 
 from flask_login import login_user,logout_user,login_required
@@ -15,10 +15,17 @@ login_bp = Blueprint('login', __name__, url_prefix='/login')
 def load_user(userid):
     return User.query.get(int(userid))
     
-@login_bp.route('/index')
+@app.route('/index')
 @login_required
 def index():
-    return render_template('main.html')
+    user=User.query.filter_by(id=session['user_id'])
+    if user:
+        user=user.first()
+        workflows = [{"name": u"选择流程", "id": 0}]
+        for role in user.roles:
+            for flow in role.flow_infos:
+                workflows.append({"name": flow.name, "id": flow.id})
+        return render_template('index.html',workflows=workflows,username=user.name)
 @login_bp.route('/',methods=['GET','POST'])
 def login():
     if request.method=="POST":
@@ -29,8 +36,9 @@ def login():
         if user:
             login_user(user)
             #return json.dumps(objs_to_json(user))
-            return redirect(url_for('login.index'))
+            #return render_template('index.html',workflows=workflows,username=user.name) 这种方式链接不会改
+            return redirect(url_for('index'))
         else:
             return err("用户密码错误")
-    elif request.method=="GET":
+    elif request.method=="GET":        
         return render_template('login.html')

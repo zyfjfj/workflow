@@ -3,7 +3,7 @@ import datetime
 
 from managesys import db, is_debug, admin
 from flask_admin.contrib.sqla import ModelView
-from ..work_flow.models import FlowInfo,role_flow
+from ..work_flow.models import FlowInfo,role_flow,FlowActionInfo
 
 class Role(db.Model):
     __tablename__="role"

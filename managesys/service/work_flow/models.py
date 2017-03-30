@@ -3,6 +3,7 @@ import datetime
 
 from managesys import db,is_debug, admin
 from flask_admin.contrib.sqla import ModelView
+from ..role.models import Role
 
 #role和flowinfo是多对多关系
 role_flow = db.Table('role_flow',
@@ -30,6 +31,8 @@ class FlowActionInfo(db.Model):
     '''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
+    role_id=db.column(db.Integer,db.ForeignKey("role.id"))
+    role = db.relationship("Role",backref='flow_action_infos', lazy='dynamic')
     desc=db.Column(db.String(500))
 
     def __repr__(self):
@@ -50,13 +53,22 @@ class FlowStepInfo(db.Model):
     def __repr__(self):
         return u'<FlowStepInfo {}>'.format(self.name)
 
+class UserFlowInfo(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
+    flow_info_id=db.Column(db.Integer,db.ForeignKey("flow_info.id"))
+    step_id=db.Column(db.Integer,db.ForeignKey("flow_step_info.id"))
+    next_user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
+    is_finish=db.Column(db.Boolean,default="N")
+
 class TranctProc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
-    step_id=db.Column(db.Integer,db.ForeignKey("flow_step_info.id"))
+    user_flow_info_id=db.Column(db.Integer,db.ForeignKey("user_flow_info.id"))
+    user_flow_info=db.relationship('UserFlowInfo',backref=db.backref('tranct_procs', lazy='dynamic'))
     step_action=db.Column(db.Integer)
     step_time=db.Column(db.DateTime,default=datetime.datetime.now())
-    next_user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
+    desc=db.Column(db.String(500))
+
 class FlowView(ModelView):
     # 是否允许创建
     can_create = True

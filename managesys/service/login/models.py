@@ -21,7 +21,7 @@ class User(db.Model, UserMixin):
 
 
     def __repr__(self):
-        return u'<用户 {}>'.format(self.name)
+        return u'<user {}>'.format(self.name)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
