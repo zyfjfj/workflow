@@ -9,7 +9,7 @@ is_debug=True
 app = Flask(__name__,template_folder='html/views',static_folder='html',static_url_path='/html')
 CORS(app, supports_credentials=True)
 admin=Admin(app,name="managesystem",template_mode="bootstrap3")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root123@127.0.0.1:3306/ftest'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1:3306/ftest'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =True
 #加入这些，admin可以增加数据

@@ -1,7 +1,7 @@
 #coding:utf-8
 from operator import attrgetter
 
-from flask import request,session
+from flask import request, session, redirect, url_for
 from flask_login import login_required
 
 from managesys import db
@@ -53,13 +53,14 @@ def todo_tranctproc():
     result=request.form['result']
     user_flow_info=UserFlowInfo.query.get(user_flow_id)
     flow_step_infos=sorted(user_flow_info.flow_info.flow_step_infos,key=attrgetter('order_no'),reverse=False)
-    if  not result=="end":
+    if  result=="end":
         user_flow_info.is_finish=True
         return '''
                     <label>终止</label>
             '''
-    if user_flow_info.step_id < len(flow_step_infos):
-        user_flow_info.step_id=flow_step_infos[user_flow_info.step_id+1].step_id
+    if user_flow_info.step.order_no < len(flow_step_infos)-1:
+        user_flow_info.step=flow_step_infos[user_flow_info.step.order_no+1]
+        user_flow_info.flow_action_info=user_flow_info.step.flow_action_info
     return '''
             <label>添加成功</label>
     '''
@@ -72,8 +73,8 @@ def add_tranctproc():
     flow_step_infos=sorted(flow_info.flow_step_infos,key=attrgetter('order_no'),reverse=False)
     user_flow_info=UserFlowInfo()
     user_flow_info.user_id=int(session['user_id'])
-    user_flow_info.flow_info_id=int(flow_info_id)
-    user_flow_info.step_id=int(flow_step_infos[0].id)
+    user_flow_info.flow_info=flow_info
+    user_flow_info.step=flow_step_infos[0]
     user_flow_info.next_user_id=flow_step_infos[1].flow_action_info.role.users.first().id
     db.session.add(user_flow_info)
     try:
@@ -91,9 +92,10 @@ def add_tranctproc():
     except Exception as e:
         print e.message
         db.session.rollback()
-    return '''
-        <label>添加成功</label>
-    '''
+        return  '''
+            <label>添加失败</label>
+            '''
+    return redirect(url_for('index'))
 @work_flow.route('/tranctproc',methods=['POST'])
 @login_required
 def flow_tranct_proc():
