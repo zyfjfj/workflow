@@ -10,6 +10,7 @@ class Role(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     name=db.Column(db.String(20))
     flow_infos=db.relationship('FlowInfo', secondary=role_flow, backref=db.backref('role',lazy='dynamic'), lazy='dynamic')
+    flow_action_infos = db.relationship("FlowActionInfo",backref=db.backref("role"))
     create_time=db.Column(db.DateTime,default=datetime.datetime.now())
     enable=db.Column(db.Boolean,default=True)
 

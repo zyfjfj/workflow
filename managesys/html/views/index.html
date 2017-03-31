@@ -24,9 +24,23 @@
         }
         
         .column {
-            max-width: 450px;
+            max-width: 800px;
         }
     </style>
+
+    <script>
+        function test(bt, result) {
+            var id = bt.parentNode.parentNode.parentNode.children[0].innerText;
+            var form = $("#todo_form");
+            var resultInput = $("<input type='text' type='hidden' name='result'/>");
+            resultInput.attr("value", result);
+            var idInput = $("<input type='text' type='hidden' name='flow_id'/>");
+            idInput.attr("value", id);
+            form.append(resultInput);
+            form.append(idInput);
+            form.submit();
+        }
+    </script>
 </head>
 
 <body>
@@ -34,16 +48,80 @@
         <div class="column">
             <h2 class="ui teal image header">
                 <div class="content">
+                    自己发起的流程
+                </div>
+            </h2>
+            <table class="ui selectable celled table">
+                <thead>
+                    <tr>
+                        <th>流程编号</th>
+                        <th>流程名称</th>
+                        <th>创建时间</th>
+                        <th>当前状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for flow in self_flows%}
+                    <tr>
+                        <td>{{flow.id}}</td>
+                        <td>{{flow.flow_info.name}}</td>
+                        <td>{{flow.create_time}}</td>
+                        <td>{{flow.step.name}}</td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+            <h2 class="ui teal image header">
+                <div class="content">
+                    待处理的流程
+                </div>
+            </h2>
+            <form class="ui form" action="http://localhost:5000/workflow/tranctproc/todo" method="POST" id="todo_form">
+
+                <table class="ui selectable celled table" id="todotb">
+                    <thead>
+                        <tr>
+                            <th>流程编号</th>
+                            <th>流程名称</th>
+                            <th>创建时间</th>
+                            <th>缘由</th>
+                            <th>处理意见</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for flow in to_do_flows%}
+                        <tr>
+                            <td>{{flow.id}}</td>
+                            <td>{{flow.flow_info.name}}</td>
+                            <td>{{flow.create_time}}</td>
+                            <td>{{flow.desc}}</td>
+                            <td>
+                                <div class="ui large buttons">
+                                    <button class="ui button" type="button" onclick="test(this,'ok')">同意</button>
+                                    <div class="or"></div>
+                                    <button class="ui button" type="button" onclick="test(this,'no')">不同意</button>
+                                    <div class="or"></div>
+                                    <button class="ui button" type="button" onclick="test(this,'end')">终止</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </form>
+            <h2 class="ui teal image header">
+                <div class="content">
                     填写流程
                 </div>
             </h2>
-            <form class="ui form" action="http://localhost:5000/workflow/tranctproc" method="POST">
+
+            <form class="ui form" action="http://localhost:5000/workflow/tranctproc/add" method="POST">
                 <div class="ui stacked segment">
                     <label>用户：{{username}}</label>
                     <div class="ui inverted divider"></div>
                     <div class="field">
                         <select name="workflow">
-                            {% for workflow in workflows %}                           
+                            {% for workflow in workflows %}
                             <option value={{workflow.id}}>{{workflow.name}}</option>
                              {% endfor %}
                         </select>
