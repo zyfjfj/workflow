@@ -19,19 +19,22 @@ def load_user(userid):
 @app.route('/index')
 @login_required
 def index():
-    user=User.query.filter_by(id=session['user_id'])
+    user=User.query.get(session['user_id'])
     user_flow_infos=UserFlowInfo.query.filter_by(user_id=session['user_id'],is_finish=False).all()
     to_do_flows=UserFlowInfo.query.filter_by(next_user_id=session['user_id'],is_finish=False).all()
+    return_to_do_flows=[]
     for to_do_flow in to_do_flows:
-        tranct_procs=to_do_flow.tranct_procs.order_by("id").all()
-        setattr(to_do_flow, "desc", tranct_procs[0].desc)
+        if user.id==to_do_flow.next_user_id:
+            tranct_procs = to_do_flow.tranct_procs.order_by("id").all()
+            setattr(to_do_flow, "desc", tranct_procs[0].desc)
+            return_to_do_flows.append(to_do_flow)
+
     if user:
-        user=user.first()
         workflows = [{"name": u"选择流程", "id": 0}]
         for role in user.roles:
             for flow in role.flow_infos:
                 workflows.append({"name": flow.name, "id": flow.id})
-        return render_template('index.html',workflows=workflows,username=user.name,self_flows=user_flow_infos,to_do_flows=to_do_flows)
+        return render_template('index.html',workflows=workflows,username=user.name,self_flows=user_flow_infos,to_do_flows=return_to_do_flows)
 @login_bp.route('/',methods=['GET','POST'])
 def login():
     if request.method=="POST":
