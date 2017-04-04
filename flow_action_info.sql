@@ -1,19 +1,50 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : db
-Source Server Version : 50549
-Source Host           : 192.168.0.116:3306
+Source Server         : local
+Source Server Version : 50715
+Source Host           : localhost:3306
 Source Database       : ftest
 
 Target Server Type    : MYSQL
-Target Server Version : 50549
+Target Server Version : 50715
 File Encoding         : 65001
 
-Date: 2017-03-31 13:41:42
+Date: 2017-04-02 13:00:36
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for category
+-- ----------------------------
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE `category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of category
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for client_status
+-- ----------------------------
+DROP TABLE IF EXISTS `client_status`;
+CREATE TABLE `client_status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pic_one` int(11) DEFAULT NULL,
+  `pic_two` int(11) DEFAULT NULL,
+  `face` int(11) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of client_status
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for flow_action_info
@@ -25,7 +56,7 @@ CREATE TABLE `flow_action_info` (
   `desc` varchar(500) DEFAULT NULL,
   `role_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of flow_action_info
@@ -33,6 +64,7 @@ CREATE TABLE `flow_action_info` (
 INSERT INTO `flow_action_info` VALUES ('1', '新建', null, '2');
 INSERT INTO `flow_action_info` VALUES ('2', '主管审批', null, '3');
 INSERT INTO `flow_action_info` VALUES ('3', '经理审批', null, '4');
+INSERT INTO `flow_action_info` VALUES ('4', '结束', null, null);
 
 -- ----------------------------
 -- Table structure for flow_info
@@ -68,7 +100,7 @@ CREATE TABLE `flow_step_info` (
   KEY `flow_action_info_id` (`flow_action_info_id`),
   CONSTRAINT `flow_step_info_ibfk_1` FOREIGN KEY (`flow_info_id`) REFERENCES `flow_info` (`id`),
   CONSTRAINT `flow_step_info_ibfk_2` FOREIGN KEY (`flow_action_info_id`) REFERENCES `flow_action_info` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of flow_step_info
@@ -76,6 +108,7 @@ CREATE TABLE `flow_step_info` (
 INSERT INTO `flow_step_info` VALUES ('1', '新建', '1', '1', '1', '0');
 INSERT INTO `flow_step_info` VALUES ('2', '主管审批', '1', '2', '1', '1');
 INSERT INTO `flow_step_info` VALUES ('3', '经理审批', '1', '3', '1', '2');
+INSERT INTO `flow_step_info` VALUES ('4', '结束', '1', '4', '1', '3');
 
 -- ----------------------------
 -- Table structure for post

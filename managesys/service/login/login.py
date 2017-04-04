@@ -20,7 +20,7 @@ def load_user(userid):
 @login_required
 def index():
     user=User.query.get(session['user_id'])
-    user_flow_infos=UserFlowInfo.query.filter_by(user_id=session['user_id'],is_finish=False).all()
+    user_flow_infos=UserFlowInfo.query.filter_by(user_id=session['user_id']).all()
     to_do_flows=UserFlowInfo.query.filter_by(next_user_id=session['user_id'],is_finish=False).all()
     return_to_do_flows=[]
     for to_do_flow in to_do_flows:

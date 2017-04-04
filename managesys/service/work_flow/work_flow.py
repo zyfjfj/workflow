@@ -1,7 +1,7 @@
 #coding:utf-8
 from operator import attrgetter
 
-from flask import request, session, redirect, url_for
+from flask import request, session, redirect, url_for, render_template
 from flask_login import login_required
 
 from managesys import db
@@ -14,18 +14,21 @@ from models import FlowInfo, TranctProc, UserFlowInfo, FlowActionInfo
 
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 
-
-@work_flow.route('/')
-def index():
-    return 'work flow!'
+handling_suggestion={1:"同意",2:"不同意",3:"终止"}
 
 @work_flow.route('/',methods=['GET','POST'])
 def flow_infos():
+    '''
+    获取和定义工作流
+    :return: 
+    '''
     query = db.session.query(FlowInfo)
     if request.method == "GET":
         flow_infos=query.all()
         if flow_infos:
-            return ok(objs_to_json(flow_infos))
+            return render_template('workflow.html',flows=flow_infos)
+    else:
+        return render_template('workflow.html')
 
 @work_flow.route('/<user_name>',methods=['GET','POST'])
 @login_required
@@ -51,9 +54,10 @@ def todo_tranctproc():
     '''
     user_flow_id = request.form['flow_id']
     result=request.form['result']
+    countersign=request.form['countersign']
     user_flow_info=UserFlowInfo.query.get(user_flow_id)
     flow_step_infos=sorted(user_flow_info.flow_info.flow_step_infos,key=attrgetter('order_no'),reverse=False)
-    if  result=="end":
+    if  result=="3":
         user_flow_info.is_finish=True
         return '''
                     <label>终止</label>
@@ -61,6 +65,25 @@ def todo_tranctproc():
     if user_flow_info.step.order_no < len(flow_step_infos)-1:
         user_flow_info.step=flow_step_infos[user_flow_info.step.order_no+1]
         user_flow_info.flow_action_info=user_flow_info.step.flow_action_info
+
+        if flow_step_infos[user_flow_info.step.order_no+1].name!=u"结束":
+            user_flow_info.next_user_id = flow_step_infos[user_flow_info.step.order_no+1].flow_action_info.role.users.first().id
+        else:
+            user_flow_info.is_finish = True
+    tranct_proc = TranctProc()
+    tranct_proc.step_action = int(result)
+    tranct_proc.user_flow_info_id = user_flow_info.id
+    tranct_proc.desc = countersign
+    db.session.add(tranct_proc)
+    try:
+        db.session.commit()
+    except Exception as e:
+        print e.message
+        db.session.rollback()
+        return '''
+               <label>添加失败</label>
+               '''
+    return redirect(url_for('index'))
     return '''
             <label>添加成功</label>
     '''
@@ -96,8 +119,15 @@ def add_tranctproc():
             <label>添加失败</label>
             '''
     return redirect(url_for('index'))
-@work_flow.route('/tranctproc',methods=['POST'])
+@work_flow.route('/tranctproc/<user_flow_id>',methods=['GET'])
 @login_required
-def flow_tranct_proc():
-    flow_info_id=request.form['workflow']
-    user_flow_infos=UserFlowInfo.query.filter_by(flow_info_id=flow_info_id,user_id=session['user_id'],is_finish=False).first()
+def flow_tranct_proc(user_flow_id):
+    pros=TranctProc.query.filter_by(user_flow_info_id=int(user_flow_id)).all()
+    return_datas=[]
+    for pro in pros:
+        data={}
+        data['step_action']=handling_suggestion[pro.step_action]
+        data['desc']=pro.desc
+        data['step_time']=pro.step_time
+        return_datas.append(data)
+    return ok(return_datas)

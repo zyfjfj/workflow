@@ -33,7 +33,7 @@ def objs_to_json(objs):
     return json_obj
 
 def ok(datas):
-    return json.dumps({"status":200,"datas":datas})
+    return json.dumps({"status":200,"data":datas})
 
 def err(datas,status=401):
-    return json.dumps({"status":status,"datas":datas})
+    return json.dumps({"status":status,"data":datas})
