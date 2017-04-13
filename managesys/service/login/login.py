@@ -51,3 +51,11 @@ def login():
             return err("用户密码错误")
     elif request.method=="GET":        
         return render_template('login.html')
+
+@app.route('/users',methods=['GET','POST'])
+def users():
+    user=User.query.all()
+    return ok(objs_to_json(user))
+@app.route('/userhtml',methods=['GET','POST'])
+def user_html():    
+    return render_template('user.html')

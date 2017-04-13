@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Standard Meta -->
+    <meta charset="utf-8" />
+    <title>user</title>
+    <link rel="stylesheet" type="text/css" href="../html/semantic/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="../html/css/dataTables.semanticui.min.css">
+    <link rel="stylesheet" type="text/css" href="../html/css/jquery.dataTables.min.css">
+    <script src="../html/js/jquery-3.1.1.min.js"></script>
+    <script src="../html/js/jquery.dataTables.min.js"></script>
+    <script src="../html/js/dataTables.semanticui.min.js"></script>
+    <script src="../html/semantic/semantic.min.js"></script>
+
+    <!--easyUI-->
+    <link rel="stylesheet" type="text/css" href="../html/easyui/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../html/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../html/easyui/themes/demo.css">
+    <script type="text/javascript" src="../html/easyui/jquery.easyui.min.js"></script>
+
+
+    <!--<style type="text/css">
+        body {
+            background-color: #DADADA;
+        }
+        
+        body>.grid {
+            height: 100%;
+        }
+        
+        .column {
+            max-width: 800px;
+        }
+    </style>-->
+
+    <script>
+        $(document).ready(function() {
+            $('#userDt').DataTable({
+                "searching": false,
+                "bPaginate": false,
+                "bInfo": false, //是否显示页脚信息，DataTables插件左下角显示记录数  
+                "bLengthChange": false, //去掉每页显示多少条数据方法
+                "language": {
+                    url: 'html/chinese.json'
+                },
+                "columns": [{
+                    //序号
+                    width: '40px',
+                    data: function(row, type, set, meta) {
+                        var c = meta.settings._iDisplayStart + meta.row + 1;
+                        return c;
+                    }
+                }, {
+                    "data": "name"
+                }, {
+                    "data": "email"
+                }, {
+                    "data": "password"
+                }, {
+                    "data": "create_time"
+                }],
+                "ajax": "/users"
+            });
+            //动态加载标题和数据
+            $.ajax({
+                url: "/users",
+                type: "get",
+                dataType: "json",
+                success: function(data) {
+                    $("#dg").datagrid("loadData", data.data); //动态取数据
+                }
+            });
+            $('#dg').datagrid({
+                columns: [
+                    [{
+                        field: 'name',
+                        title: 'name',
+                    }, {
+                        field: 'email',
+                        title: 'email',
+                    }, {
+                        field: 'password',
+                        title: 'password',
+                    }, {
+                        field: 'create_time',
+                        title: 'create_time',
+                    }]
+                ]
+            });
+        })
+    </script>
+</head>
+
+<body>
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <table class="ui selectable celled table" id="userDt">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>姓名</th>
+                        <th>email</th>
+                        <th>密码</th>
+                        <th>创建时间</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <div class="easyui-panel" title="New Topic" style="width:800px ">
+        <table id="dg" class="easyui-datagrid" toolbar="#toolbar" data-options="rownumbers:true,fitColumns:true,singleSelect:true">
+        </table>
+    </div>
+    <div id="toolbar">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">New User</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">Edit User</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">Remove User</a>
+    </div>
+</body>
+
+</html>
