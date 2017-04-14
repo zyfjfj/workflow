@@ -18,106 +18,86 @@
     <link rel="stylesheet" type="text/css" href="../html/easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="../html/easyui/themes/demo.css">
     <script type="text/javascript" src="../html/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.edatagrid.js"></script>
 
-
-    <!--<style type="text/css">
-        body {
-            background-color: #DADADA;
-        }
-        
-        body>.grid {
-            height: 100%;
-        }
-        
-        .column {
-            max-width: 800px;
-        }
-    </style>-->
-
-    <script>
-        $(document).ready(function() {
-            $('#userDt').DataTable({
-                "searching": false,
-                "bPaginate": false,
-                "bInfo": false, //是否显示页脚信息，DataTables插件左下角显示记录数  
-                "bLengthChange": false, //去掉每页显示多少条数据方法
-                "language": {
-                    url: 'html/chinese.json'
-                },
-                "columns": [{
-                    //序号
-                    width: '40px',
-                    data: function(row, type, set, meta) {
-                        var c = meta.settings._iDisplayStart + meta.row + 1;
-                        return c;
-                    }
-                }, {
-                    "data": "name"
-                }, {
-                    "data": "email"
-                }, {
-                    "data": "password"
-                }, {
-                    "data": "create_time"
-                }],
-                "ajax": "/users"
-            });
-            //动态加载标题和数据
-            $.ajax({
-                url: "/users",
-                type: "get",
-                dataType: "json",
-                success: function(data) {
-                    $("#dg").datagrid("loadData", data.data); //动态取数据
-                }
-            });
-            $('#dg').datagrid({
-                columns: [
-                    [{
-                        field: 'name',
-                        title: 'name',
-                    }, {
-                        field: 'email',
-                        title: 'email',
-                    }, {
-                        field: 'password',
-                        title: 'password',
-                    }, {
-                        field: 'create_time',
-                        title: 'create_time',
-                    }]
-                ]
-            });
-        })
-    </script>
+    <script src="../html/control/user.js"></script>
 </head>
 
-<body>
-    <div class="ui middle aligned center aligned grid">
-        <div class="column">
-            <table class="ui selectable celled table" id="userDt">
-                <thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>姓名</th>
-                        <th>email</th>
-                        <th>密码</th>
-                        <th>创建时间</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
+<body class="easyui-layout">
+    <div data-options="region:'north',title:'North Title',split:true" style="height:100px;"></div>
+    <div data-options="region:'south',title:'South Title',split:true" style="height:100px;"></div>
+    <div data-options="region:'east',title:'East',split:true" style="width:100px;"></div>
+    <div data-options="region:'west',title:'West',split:true" style="width:100px;"></div>
+    <div data-options="region:'center',title:'center title'" style="padding:5px;background:#eee;">
+        <div class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+            <div title="semanticui" style="padding:10px">
+                <div class="column">
+                    <table class="ui selectable celled table" id="userDt">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>序号</th>
+                                <th>姓名</th>
+                                <th>email</th>
+                                <th>密码</th>
+                                <th>创建时间</th>
+                            </tr>
+                        </thead>
+                        <tfoot class="full-width">
+                            <tr>
+                                <th></th>
+                                <th colspan="5">
+                                    <div class="ui right floated small primary labeled icon button">
+                                        <i class="user icon"></i>增加用户
+                                    </div>
+                                    <div class="ui small  button">
+                                        删除
+                                    </div>
+                                    <div class="ui small  disabled button">
+                                        全部删除
+                                    </div>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
 
-    <div class="easyui-panel" title="New Topic" style="width:800px ">
-        <table id="dg" class="easyui-datagrid" toolbar="#toolbar" data-options="rownumbers:true,fitColumns:true,singleSelect:true">
-        </table>
-    </div>
-    <div id="toolbar">
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">New User</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">Edit User</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">Remove User</a>
+            <div title="easyui" style="padding:10px">
+                <table id="dg" class="easyui-datagrid" toolbar="#toolbar" data-options="rownumbers:true,fitColumns:true,singleSelect:true">
+                </table>
+            </div>
+
+        </div>
+        <!--表格按钮-->
+        <div id="toolbar">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">增加用户</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑用户</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除用户</a>
+        </div>
+        <!--增加用户对话框-->
+        <div id="dlg" class="easyui-dialog" style="width:400px" closed="true" buttons="#dlg-buttons">
+            <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+                <div style="margin-bottom:20px;font-size:14px;border-bottom:1px solid #ccc">User Information</div>
+                <div style="margin-bottom:10px">
+                    <input name="name" class="easyui-textbox" required="true" label="用户名:" style="width:100%">
+                </div>
+                <div style="margin-bottom:10px">
+                    <input name="email" class="easyui-textbox" required="true" validType="email" label="Email:" style="width:100%">
+                </div>
+                <div style="margin-bottom:10px">
+                    <input name="password" class="easyui-textbox" required="true" label="密码:" style="width:100%">
+                </div>
+                <div style="margin-bottom:10px">
+                    <input name="towPassword" class="easyui-textbox" required="true" label="确认密码:" style="width:100%">
+                </div>
+
+            </form>
+        </div>
+        <div id="dlg-buttons">
+            <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">保存</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
+        </div>
     </div>
 </body>
 
