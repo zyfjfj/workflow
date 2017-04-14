@@ -1,4 +1,4 @@
-# coding=utf-8 
+# coding=utf-8
 """
 @version: ??
 @author: zhayufeng
@@ -14,7 +14,7 @@ from tornado.ioloop import IOLoop
 import tornado.options
 from managesys import app
 
-if __name__=="__main__":
+if __name__ == "__main__":
     tornado.options.parse_command_line()
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(5000)

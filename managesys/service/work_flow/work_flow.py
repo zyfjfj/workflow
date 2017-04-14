@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding:utf-8
 from operator import attrgetter
 
 from flask import request, session, redirect, url_for, render_template
@@ -7,16 +7,17 @@ from flask_login import login_required
 from managesys import db
 from flask import Blueprint
 
-from managesys.moudel.util import ok,objs_to_json
+from managesys.moudel.util import ok, objs_to_json
 from managesys.service.login.models import User
 from managesys.service.role.models import Role
 from models import FlowInfo, TranctProc, UserFlowInfo, FlowActionInfo
 
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 
-handling_suggestion={1:"同意",2:"不同意",3:"终止"}
+handling_suggestion = {1: "同意", 2: "不同意", 3: "终止"}
 
-@work_flow.route('/',methods=['GET','POST'])
+
+@work_flow.route('/', methods=['GET', 'POST'])
 def flow_infos():
     '''
     获取和定义工作流
@@ -24,13 +25,14 @@ def flow_infos():
     '''
     query = db.session.query(FlowInfo)
     if request.method == "GET":
-        flow_infos=query.all()
+        flow_infos = query.all()
         if flow_infos:
-            return render_template('workflow.html',flows=flow_infos)
+            return render_template('workflow.html', flows=flow_infos)
     else:
         return render_template('workflow.html')
 
-@work_flow.route('/<user_name>',methods=['GET','POST'])
+
+@work_flow.route('/<user_name>', methods=['GET', 'POST'])
 @login_required
 def flow_infos_by_role(user_name):
     '''
@@ -38,13 +40,15 @@ def flow_infos_by_role(user_name):
     :param role_name:
     :return:
     '''
-    if request.method=="GET":
-        users=User.query.filter_by(name=user_name)
+    if request.method == "GET":
+        users = User.query.filter_by(name=user_name)
         if users:
-            roles=users.first().roles.all()
+            roles = users.first().roles.all()
             return ok(objs_to_json(roles))
         return ok(u"没有数据")
-@work_flow.route('/tranctproc/todo',methods=['POST'])
+
+
+@work_flow.route('/tranctproc/todo', methods=['POST'])
 @login_required
 def todo_tranctproc():
     '''
@@ -53,21 +57,23 @@ def todo_tranctproc():
     :return:
     '''
     user_flow_id = request.form['flow_id']
-    result=request.form['result']
-    countersign=request.form['countersign']
-    user_flow_info=UserFlowInfo.query.get(user_flow_id)
-    flow_step_infos=sorted(user_flow_info.flow_info.flow_step_infos,key=attrgetter('order_no'),reverse=False)
-    if  result=="3":
-        user_flow_info.is_finish=True
+    result = request.form['result']
+    countersign = request.form['countersign']
+    user_flow_info = UserFlowInfo.query.get(user_flow_id)
+    flow_step_infos = sorted(
+        user_flow_info.flow_info.flow_step_infos, key=attrgetter('order_no'), reverse=False)
+    if result == "3":
+        user_flow_info.is_finish = True
         return '''
                     <label>终止</label>
             '''
-    if user_flow_info.step.order_no < len(flow_step_infos)-1:
-        user_flow_info.step=flow_step_infos[user_flow_info.step.order_no+1]
-        user_flow_info.flow_action_info=user_flow_info.step.flow_action_info
+    if user_flow_info.step.order_no < len(flow_step_infos) - 1:
+        user_flow_info.step = flow_step_infos[user_flow_info.step.order_no + 1]
+        user_flow_info.flow_action_info = user_flow_info.step.flow_action_info
 
-        if flow_step_infos[user_flow_info.step.order_no+1].name!=u"结束":
-            user_flow_info.next_user_id = flow_step_infos[user_flow_info.step.order_no+1].flow_action_info.role.users.first().id
+        if flow_step_infos[user_flow_info.step.order_no + 1].name != u"结束":
+            user_flow_info.next_user_id = flow_step_infos[
+                user_flow_info.step.order_no + 1].flow_action_info.role.users.first().id
         else:
             user_flow_info.is_finish = True
     tranct_proc = TranctProc()
@@ -88,46 +94,53 @@ def todo_tranctproc():
             <label>添加成功</label>
     '''
 
-@work_flow.route('/tranctproc/add',methods=['POST'])
+
+@work_flow.route('/tranctproc/add', methods=['POST'])
 @login_required
 def add_tranctproc():
-    flow_info_id=request.form['workflow']
-    flow_info=FlowInfo.query.get(flow_info_id)
-    flow_step_infos=sorted(flow_info.flow_step_infos,key=attrgetter('order_no'),reverse=False)
-    user_flow_info=UserFlowInfo()
-    user_flow_info.user_id=int(session['user_id'])
-    user_flow_info.flow_info=flow_info
-    user_flow_info.step=flow_step_infos[0]
-    user_flow_info.next_user_id=flow_step_infos[1].flow_action_info.role.users.first().id
+    flow_info_id = request.form['workflow']
+    flow_info = FlowInfo.query.get(flow_info_id)
+    flow_step_infos = sorted(flow_info.flow_step_infos,
+                             key=attrgetter('order_no'), reverse=False)
+    user_flow_info = UserFlowInfo()
+    user_flow_info.user_id = int(session['user_id'])
+    user_flow_info.flow_info = flow_info
+    user_flow_info.step = flow_step_infos[0]
+    user_flow_info.next_user_id = flow_step_infos[
+        1].flow_action_info.role.users.first().id
     db.session.add(user_flow_info)
     try:
         db.session.commit()
     except Exception as e:
         print e.message
         db.session.rollback()
-    tranct_proc=TranctProc()
-    tranct_proc.step_action=1
-    tranct_proc.user_flow_info_id=user_flow_info.id
-    tranct_proc.desc=request.form['reason']
+    tranct_proc = TranctProc()
+    tranct_proc.step_action = 1
+    tranct_proc.user_flow_info_id = user_flow_info.id
+    tranct_proc.desc = request.form['reason']
     db.session.add(tranct_proc)
     try:
         db.session.commit()
     except Exception as e:
         print e.message
         db.session.rollback()
-        return  '''
-            <label>添加失败</label>
-            '''
+        return
+        '''
+        <label>添加失败</label>
+        '''
     return redirect(url_for('index'))
-@work_flow.route('/tranctproc/<user_flow_id>',methods=['GET'])
+
+
+@work_flow.route('/tranctproc/<user_flow_id>', methods=['GET'])
 @login_required
 def flow_tranct_proc(user_flow_id):
-    pros=TranctProc.query.filter_by(user_flow_info_id=int(user_flow_id)).all()
-    return_datas=[]
+    pros = TranctProc.query.filter_by(
+        user_flow_info_id=int(user_flow_id)).all()
+    return_datas = []
     for pro in pros:
-        data={}
-        data['step_action']=handling_suggestion[pro.step_action]
-        data['desc']=pro.desc
-        data['step_time']=pro.step_time
+        data = {}
+        data['step_action'] = handling_suggestion[pro.step_action]
+        data['desc'] = pro.desc
+        data['step_time'] = pro.step_time
         return_datas.append(data)
     return ok(return_datas)

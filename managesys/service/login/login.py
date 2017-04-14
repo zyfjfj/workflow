@@ -71,14 +71,15 @@ def users():
         user = User()
         user.name = request.form['name']
         user.email = request.form['email']
-        user.password = request.form['password'] 
+        user.password = request.form['password']
         db.session.add(user)
-        try:        
-            db.session.commit()            
+        try:
+            db.session.commit()
         except Exception as e:
             db.session.rollback()
             return ok(e.message)
         return ok("")
+
 
 @app.route('/userhtml', methods=['GET', 'POST'])
 def user_html():
