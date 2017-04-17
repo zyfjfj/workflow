@@ -12,3 +12,12 @@ content-type: application/json
 
 ###获取所有工作流
 GET http://localhost:5000/workflow/flowinfos
+###
+POST http://localhost:5000/users HTTP/1.1
+content-type: application/json
+
+{
+    "id":1,
+    "name": "zyf",
+    "password": "11111"
+}

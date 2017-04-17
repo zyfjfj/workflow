@@ -62,7 +62,7 @@ def login():
         return render_template('login.html')
 
 
-@app.route('/users', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST', 'DELETE'])
 def users():
     if request.method == "GET":
         user = User.query.all()
@@ -79,6 +79,9 @@ def users():
             db.session.rollback()
             return ok(e.message)
         return ok("")
+    elif request.method == "DELETE":
+        user = request.json
+        return ok(user)
 
 
 @app.route('/userhtml', methods=['GET', 'POST'])

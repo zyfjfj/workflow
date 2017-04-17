@@ -11,7 +11,7 @@ $(document).ready(function() {
             width: '40px',
             data: function() {
                 return "<div class='ui fitted slider checkbox'>" +
-                    "<input type='checkbox'> <label></label> </div>"
+                    "<input type='checkbox' id='this.name' onclick= 'checkbox_click(this)'> <label></label> </div>"
             }
         }, {
             //序号
@@ -31,6 +31,29 @@ $(document).ready(function() {
         }],
         "ajax": "/users"
     });
+    $("#btn_all_del").api({
+        url: '/users',
+        method: 'DELETE',
+        beforeXHR: (xhr) => {
+
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+        },
+        beforeSend: (settings) => {
+            var checkeds = $('input:checkbox:checked');
+            settings.data = JSON.stringify({
+                "datas": ["1", "2", "4"],
+                "name": "zyf"
+            });
+            return settings;
+        },
+        onSuccess: function(response) {
+            console.log(response);
+        }
+    });
+    /**
+     * easyui
+     */
     //动态加载标题和数据
     $.ajax({
         url: "/users",
@@ -59,6 +82,18 @@ $(document).ready(function() {
     });
 })
 
+
+function checkbox_click(checkbox) {
+    if (checkbox.checked) {
+        var btn_del = $("#btn_del");
+        btn_del.removeClass("disabled");
+        //btn_del.addClass("ui small button");
+    } else {
+        var btn_del = $("#btn_del");
+        //btn_del.removeClass();
+        btn_del.addClass("disabled");
+    }
+}
 var url;
 
 function newUser() {
