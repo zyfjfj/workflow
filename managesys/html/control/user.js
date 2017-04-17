@@ -9,9 +9,9 @@ $(document).ready(function() {
         },
         "columns": [{
             width: '40px',
-            data: function() {
+            data: function(row, meta) {
                 return "<div class='ui fitted slider checkbox'>" +
-                    "<input type='checkbox' id='this.name' onclick= 'checkbox_click(this)'> <label></label> </div>"
+                    "<input type='checkbox' id=" + row["id"] + " onclick= 'checkbox_click(this)'> <label></label> </div>"
             }
         }, {
             //序号
@@ -41,8 +41,12 @@ $(document).ready(function() {
         },
         beforeSend: (settings) => {
             var checkeds = $('input:checkbox:checked');
+            var datas = [];
+            for (var k = 0, length = checkeds.length; k < length; k++) {
+                datas.push(checkeds[k].id);
+            }
             settings.data = JSON.stringify({
-                "datas": ["1", "2", "4"],
+                "datas": datas,
                 "name": "zyf"
             });
             return settings;
@@ -84,7 +88,8 @@ $(document).ready(function() {
 
 
 function checkbox_click(checkbox) {
-    if (checkbox.checked) {
+    var hasChecked = $('input:checkbox:checked').length > 0;
+    if (checkbox.checked || hasChecked) {
         var btn_del = $("#btn_del");
         btn_del.removeClass("disabled");
         //btn_del.addClass("ui small button");
