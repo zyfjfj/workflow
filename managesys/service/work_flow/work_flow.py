@@ -8,9 +8,8 @@ from managesys import db
 from flask import Blueprint
 
 from managesys.moudel.util import ok, objs_to_json
-from managesys.service.login.models import User
-from managesys.service.role.models import Role
-from models import FlowInfo, TranctProc, UserFlowInfo, FlowActionInfo
+
+from ..model.models import User, Role, FlowInfo, TranctProc, UserFlowInfo, FlowActionInfo
 
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 
