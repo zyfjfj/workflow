@@ -1,15 +1,14 @@
 # coding:utf-8
 from flask import Blueprint, request, render_template, redirect, url_for, session
-from flask import flash, json
-from managesys import db
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, login_required
 
+from managesys import db
 from managesys import login_manager, app
 from managesys.moudel.util import objs_to_json, ok, err
-from ..work_flow.models import UserFlowInfo
-from models import User
+from ..model.models import UserFlowInfo, User
 
 login_bp = Blueprint('login', __name__, url_prefix='/login')
+
 
 # 当登陆成功后，该函数会自动从会话中存储的用户 ID 重新加载用户对象。它应该接受一个用户的 unicode ID 作为参数，并且返回相应的用户对象。
 
@@ -39,7 +38,8 @@ def index():
         for role in user.roles:
             for flow in role.flow_infos:
                 workflows.append({"name": flow.name, "id": flow.id})
-        return render_template('index.html', workflows=workflows, username=user.name, self_flows=user_flow_infos, to_do_flows=return_to_do_flows)
+        return render_template('index.html', workflows=workflows, username=user.name, self_flows=user_flow_infos,
+                               to_do_flows=return_to_do_flows)
 
 
 @login_bp.route('/', methods=['GET', 'POST'])
