@@ -1,10 +1,18 @@
 # coding:utf-8
 import datetime
+import uuid
 
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
 
 from managesys import db, is_debug, admin
+
+import sqlalchemy.types as types
+
+
+def generate_uuid():
+   return uuid.uuid4().hex
+
 
 user_role = db.Table('user_role',
                      db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -18,23 +26,11 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=user_role, backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(30), unique=True)
+    company_id=db.Column(db.String(32),db.ForeignKey('company.id'))
     create_time = db.Column(db.DateTime, default=datetime.datetime.now())
 
     def __repr__(self):
         return u'<user {}>'.format(self.name)
-
-
-class UserView(ModelView):
-    # 是否允许创建
-    can_create = is_debug
-    # 显示的字段
-    column_searchable_list = ('name', 'email')
-
-    def is_accessible(self):
-        return is_debug
-
-    def __init__(self, session, **kwargs):
-        super(UserView, self).__init__(User, session, **kwargs)
 
 
 # role和flowinfo是多对多关系
@@ -56,6 +52,17 @@ class Role(db.Model):
 
     def __repr__(self):
         return u'<角色 {}>'.format(self.name)
+
+class Company(db.Model):
+    __tablename__ = "company"
+    id = db.Column(db.String(32), primary_key=True,default=generate_uuid)
+    name = db.Column(db.String(100))
+    users=db.relationship('User',backref='company',
+                                lazy='dynamic')
+    def __unicode__(self):
+        return u'<单位 {}>'.format(self.name)
+    def __repr__(self):
+        return u'<单位 {}>'.format(self.name)
 
 
 class FlowInfo(db.Model):
@@ -109,15 +116,15 @@ class UserFlowInfo(db.Model):
     '''
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    #因为这里有两个user.id，所有要指定改UserFlowInfo.user_id
-    user=db.relationship('User',  foreign_keys='UserFlowInfo.user_id',backref=db.backref('user_flow_infos'))
+    # 因为这里有两个user.id，所有要指定改UserFlowInfo.user_id
+    user = db.relationship('User', foreign_keys='UserFlowInfo.user_id', backref=db.backref('user_flow_infos'))
     flow_info_id = db.Column(db.Integer, db.ForeignKey("flow_info.id"))
     flow_info = db.relationship('FlowInfo', backref=db.backref('user_flow_infos'))
     step_id = db.Column(db.Integer, db.ForeignKey("flow_step_info.id"))
     step = db.relationship('FlowStepInfo', backref=db.backref('user_flow_infos'))
     next_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    #因为这里有两个user.id，所有要指定改UserFlowInfo.next_user_id
-    next_user=db.relationship('User',  foreign_keys='UserFlowInfo.next_user_id')
+    # 因为这里有两个user.id，所有要指定改UserFlowInfo.next_user_id
+    next_user = db.relationship('User', foreign_keys='UserFlowInfo.next_user_id')
     is_finish = db.Column(db.Boolean, default=False)
     create_time = db.Column(db.DateTime, default=datetime.datetime.now())
 
@@ -148,6 +155,17 @@ class FlowView(ModelView):
         return is_debug
 
 
+class UserView(ModelView):
+    # 是否允许创建
+    can_create = is_debug
+    # 显示的字段
+    column_searchable_list = ('name', 'email')
+
+    def is_accessible(self):
+        return is_debug
+
+    def __init__(self, session, **kwargs):
+        super(UserView, self).__init__(User, session, **kwargs)
 
 
 admin.add_view(UserView(db.session))
@@ -157,3 +175,4 @@ admin.add_view(FlowView(FlowActionInfo, db.session))
 admin.add_view(ModelView(TranctProc, db.session))
 admin.add_view(ModelView(Role, db.session))
 admin.add_view(ModelView(UserFlowInfo, db.session))
+admin.add_view(ModelView(Company, db.session))

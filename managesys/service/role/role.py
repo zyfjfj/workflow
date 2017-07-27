@@ -10,8 +10,8 @@
 """
 from flask import Blueprint, request
 
-from managesys.moudel.util import ok, objs_to_json
-from ..model.models import Role
+from ...model.models import Role
+from ...moudel.util import ok, objs_to_json
 
 role = Blueprint('app_role', __name__, url_prefix='/role')
 

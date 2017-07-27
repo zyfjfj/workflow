@@ -1,15 +1,13 @@
 # coding:utf-8
 from operator import attrgetter
 
+from flask import Blueprint
 from flask import request, session, redirect, url_for, render_template
 from flask_login import login_required
 
-from managesys import db
-from flask import Blueprint
-
-from managesys.moudel.util import ok, objs_to_json
-
-from ..model.models import User, Role, FlowInfo, TranctProc, UserFlowInfo, FlowActionInfo
+from ... import db
+from ...model.models import User, FlowInfo, TranctProc, UserFlowInfo
+from ...moudel.util import ok, objs_to_json
 
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 

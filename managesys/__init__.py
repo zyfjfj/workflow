@@ -5,6 +5,7 @@ from flask_admin import Admin
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_babelex import Babel
 
 is_debug = True
 app = Flask(__name__, template_folder='html/views',
@@ -28,6 +29,9 @@ login_manager.init_app(app)
 login_manager.login_view = "login.login"
 
 db = SQLAlchemy(app)
+#用babel做国际化
+babel = Babel(app)
+app.config['BABEL_DEFAULT_LOCALE'] = 'zh_CN'
 # 这里要导入蓝图
 from managesys.service.login import login
 from managesys.service.role import role

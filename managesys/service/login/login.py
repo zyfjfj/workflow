@@ -1,11 +1,12 @@
 # coding:utf-8
+import flask_login
 from flask import Blueprint, request, render_template, redirect, url_for, session
 from flask_login import login_user, login_required
 
 from managesys import db
 from managesys import login_manager, app
-from managesys.moudel.util import objs_to_json, ok, err
-from ..model.models import UserFlowInfo, User
+from ...model.models import UserFlowInfo, User
+from ...moudel.util import objs_to_json, ok, err
 
 login_bp = Blueprint('login', __name__, url_prefix='/login')
 
@@ -22,6 +23,7 @@ def load_user(userid):
 @login_required
 def index():
     user = User.query.get(session['user_id'])
+    user= flask_login.current_user
     user_flow_infos = UserFlowInfo.query.filter_by(
         user_id=session['user_id']).all()
     to_do_flows = UserFlowInfo.query.filter_by(
