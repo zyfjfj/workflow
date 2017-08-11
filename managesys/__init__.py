@@ -41,4 +41,5 @@ from managesys.service.work_flow import work_flow
 app.register_blueprint(login.login_bp)
 app.register_blueprint(work_flow.work_flow)
 app.register_blueprint(role.role)
+app.register_blueprint(work_flow.workflow)
 db.create_all()

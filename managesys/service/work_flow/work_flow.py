@@ -1,13 +1,14 @@
 # coding:utf-8
 from operator import attrgetter
 
+import flask_login
 from flask import Blueprint
 from flask import request, session, redirect, url_for, render_template
 from flask_login import login_required
-
 from ... import db
-from ...model.models import User, FlowInfo, TranctProc, UserFlowInfo
-from ...moudel.util import ok, objs_to_json
+from ...model.models import User, FlowInfo, TranctProc, UserFlowInfo, Role
+from ...moudel.util import ok, objs_to_json, ObjectToDictEx, err
+from ...model.work_flow_models import Workflow, WorkflowStep
 
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 
@@ -27,6 +28,11 @@ def flow_infos():
             return render_template('workflow.html', flows=flow_infos)
     else:
         return render_template('workflow.html')
+
+
+@work_flow.route("/design", methods=['GET'])
+def design_workflow():
+    return render_template('workflowUi.html')
 
 
 @work_flow.route('/<user_name>', methods=['GET', 'POST'])
@@ -81,7 +87,7 @@ def todo_tranctproc():
     try:
         db.session.commit()
     except Exception as e:
-        print e.message
+        print(e.message)
         db.session.rollback()
         return '''
                <label>添加失败</label>
@@ -103,13 +109,12 @@ def add_tranctproc():
     user_flow_info.user_id = int(session['user_id'])
     user_flow_info.flow_info = flow_info
     user_flow_info.step = flow_step_infos[0]
-    user_flow_info.next_user_id = flow_step_infos[
-        1].flow_action_info.role.users.first().id
+    user_flow_info.next_user_id = flow_step_infos[1].flow_action_info.role.users.first().id
     db.session.add(user_flow_info)
     try:
         db.session.commit()
     except Exception as e:
-        print e.message
+        print(e.message)
         db.session.rollback()
     tranct_proc = TranctProc()
     tranct_proc.step_action = 1
@@ -119,7 +124,7 @@ def add_tranctproc():
     try:
         db.session.commit()
     except Exception as e:
-        print e.message
+        print(e.message)
         db.session.rollback()
         return
         '''
@@ -131,8 +136,7 @@ def add_tranctproc():
 @work_flow.route('/tranctproc/<user_flow_id>', methods=['GET'])
 @login_required
 def flow_tranct_proc(user_flow_id):
-    pros = TranctProc.query.filter_by(
-        user_flow_info_id=int(user_flow_id)).all()
+    pros = TranctProc.query.filter_by(user_flow_info_id=int(user_flow_id)).all()
     return_datas = []
     for pro in pros:
         data = {}
@@ -141,3 +145,27 @@ def flow_tranct_proc(user_flow_id):
         data['step_time'] = pro.step_time
         return_datas.append(data)
     return ok(return_datas)
+
+workflow = Blueprint('flow', __name__, url_prefix='/work_flow')
+
+@workflow.route('/', methods=['GET', 'POST'])
+def get_workfolws():
+    if request.method=="GET":
+        query = db.session.query(Workflow)
+        workflows = query.all()
+        convert = ObjectToDictEx([Role, WorkflowStep])
+        objs = convert(workflows)
+        if workflows:
+            return ok(objs)
+
+
+@workflow.route('/user', methods=['GET', 'POST'])
+def user_workfolws():
+    try:
+        user = flask_login.current_user
+        if request.method=="GET":
+            return ok('获取')
+        elif request.method=="POST":
+            return ok('创建')
+    except Exception as e:
+        return err(e.args())

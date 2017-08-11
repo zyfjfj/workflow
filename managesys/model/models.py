@@ -4,15 +4,10 @@ import uuid
 
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
-
+from ..moudel.util import generate_uuid
 from managesys import db, is_debug, admin
 
 import sqlalchemy.types as types
-
-
-def generate_uuid():
-   return uuid.uuid4().hex
-
 
 user_role = db.Table('user_role',
                      db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -26,7 +21,7 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=user_role, backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(30), unique=True)
-    company_id=db.Column(db.String(32),db.ForeignKey('company.id'))
+    company_id = db.Column(db.String(32), db.ForeignKey('company.id'))
     create_time = db.Column(db.DateTime, default=datetime.datetime.now())
 
     def __repr__(self):
@@ -53,14 +48,16 @@ class Role(db.Model):
     def __repr__(self):
         return u'<角色 {}>'.format(self.name)
 
+
 class Company(db.Model):
     __tablename__ = "company"
-    id = db.Column(db.String(32), primary_key=True,default=generate_uuid)
+    id = db.Column(db.String(32), primary_key=True, default=generate_uuid)
     name = db.Column(db.String(100))
-    users=db.relationship('User',backref='company',
-                                lazy='dynamic')
+    users = db.relationship('User', backref='company', lazy='dynamic')
+
     def __unicode__(self):
         return u'<单位 {}>'.format(self.name)
+
     def __repr__(self):
         return u'<单位 {}>'.format(self.name)
 
@@ -169,7 +166,6 @@ class UserView(ModelView):
 
 
 admin.add_view(UserView(db.session))
-admin.add_view(FlowView(FlowInfo, db.session))
 admin.add_view(FlowView(FlowStepInfo, db.session))
 admin.add_view(FlowView(FlowActionInfo, db.session))
 admin.add_view(ModelView(TranctProc, db.session))
