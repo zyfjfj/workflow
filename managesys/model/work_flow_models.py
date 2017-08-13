@@ -15,7 +15,7 @@ from sqlalchemy.orm import relationship
 
 from managesys import db, admin
 from ..moudel.util import generate_uuid
-
+from .models import User,Role
 Base = db.Model
 
 role_Workflow = db.Table('role_workflow',
@@ -60,6 +60,9 @@ class WorkflowStep(Base):
     next_step_id = Column(ForeignKey("workflow_step.id"))
     next_step = relationship('WorkflowStep', foreign_keys='WorkflowStep.next_step_id')
 
+    def get_role(self):
+        obj = db.session.query(Role).get(self.role_id)
+        return obj
     def __repr__(self):
         return u'<步骤表 {}>'.format(self.name)
 
@@ -82,6 +85,9 @@ class UserWorkflowInfo(Base):
     is_finish = Column(Boolean, default=False)
     create_time = Column(DateTime, default=datetime.datetime.now())
 
+    def get_next_user(self):
+        obj = db.session.query(User).get(self.next_user_id)
+        return obj
     def __repr__(self):
         return u'<用户流程记录表 {},{}>'.format(self.workflow.name, self.step.name)
 

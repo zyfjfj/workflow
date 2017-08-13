@@ -157,6 +157,8 @@ def get_workfolws():
         objs = convert(workflows)
         if workflows:
             return ok(objs)
+        else:
+            return ok('没有数据')
 
 
 @workflow.route('/user', methods=['GET', 'POST'])
@@ -169,3 +171,20 @@ def user_workfolws():
             return ok('创建')
     except Exception as e:
         return err(e.args())
+
+@workflow.route('/bokeh')
+def bokeh():
+    from bokeh.plotting import figure, output_file,show
+    # prepare some data
+    x = [1, 2, 3, 4, 5]
+    y = [6, 7, 2, 4, 5]
+    # output to static HTML file
+    output_file("../../blines.html")
+
+    # create a new plot with a title and axis labels
+    p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+
+    # add a line renderer with legend and line thickness
+    p.line(x, y, legend="Temp.", line_width=2)
+    show(p)
+    return render_template('workflow.html')
