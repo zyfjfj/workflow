@@ -2,13 +2,14 @@
 from operator import attrgetter
 
 import flask_login
-from flask import Blueprint
+import time
+from flask import Blueprint, json
 from flask import request, session, redirect, url_for, render_template
 from flask_login import login_required
-from ... import db
+from ... import db, app
 from ...model.models import User, FlowInfo, TranctProc, UserFlowInfo, Role
 from ...moudel.util import ok, objs_to_json, ObjectToDictEx, err
-from ...model.work_flow_models import Workflow, WorkflowStep
+from ...model.work_flow_models import Workflow, WorkflowStep, UserWorkflowInfo, UserWorkflowInfoDetail, WorkflowComment
 
 work_flow = Blueprint('work_flow', __name__, url_prefix='/workflow')
 
@@ -161,14 +162,74 @@ def get_workfolws():
             return ok('没有数据')
 
 
-@workflow.route('/user', methods=['GET', 'POST'])
+@workflow.route('/user', methods=['GET', 'POST','PUT'])
 def user_workfolws():
     try:
         user = flask_login.current_user
         if request.method=="GET":
-            return ok('获取')
+            user_id = request.args.get('user_id', '')
+            u_workflow_infos = UserWorkflowInfo.query.filter_by(user_id=user_id).all()
+            convert = ObjectToDictEx([Role, WorkflowStep])
+            objs = convert(u_workflow_infos)
+            return ok(objs)
         elif request.method=="POST":
+            workflow_id = request.form['workflow_id']
+            user_id = request.form['user_id']
+            comment=request.form['comment']
+            desc=request.form['desc']
+            user = User.query.get(user_id)
+            workflow=Workflow.query.get(workflow_id)
+            workflow_step=None
+            role=None
+            for r in user.roles:
+                workflow_step=WorkflowStep.query.filter_by(workflow_id=workflow_id,role_id=r.id).first()
+                if workflow_step:
+                    role=r
+                    break
+            if workflow_step is None:
+                return err("该用户没有权限")
+            user_workflow_info=UserWorkflowInfo(role=role,workflow_id=workflow_id,step_id=workflow_step.id,
+                                                 next_role=workflow_step.next_step[0].role,user_id=user_id)
+            db.session.add(user_workflow_info)
+            db.session.flush()
+            u_workflow_detail=UserWorkflowInfoDetail(comment=comment,user_workflow_info_id=user_workflow_info.id
+                                                     ,desc=desc)
+            db.session.add(u_workflow_detail)
+            db.session.commit()
             return ok('创建')
+        elif request.method=="PUT":
+            data = json.loads(request.data)
+            u_workflow_info_id=data['u_workflow_info_id']
+            user_id=data['user_id']
+            desc=data['desc']
+            comment=data['comment']
+            u_workflow_info = UserWorkflowInfo.query.get(u_workflow_info_id)
+            user = User.query.get(user_id)
+            role=None
+            workflow_step=None
+            for r in user.roles:
+                workflow_step = WorkflowStep.query.filter_by(workflow_id=u_workflow_info.workflow_id, role_id=r.id).first()
+                if workflow_step:
+                    role = r
+                    break
+            if workflow_step is None:
+                return err("没有找到")
+            if comment == WorkflowComment.Agree:#同意
+                u_workflow_info.role=role
+                u_workflow_info.step_id = workflow_step.id
+                if workflow_step.next_step:
+                    u_workflow_info.next_role = workflow_step.next_step[0].role
+                else:
+                    u_workflow_info.is_finish = True
+            elif comment==WorkflowComment.Refuse:
+                u_workflow_info.is_finish=True
+            elif comment==WorkflowComment.Abort:
+                u_workflow_info.is_finish = True
+            u_workflow_detail = UserWorkflowInfoDetail(comment=comment, user_workflow_info_id=u_workflow_info.id,
+                                                       desc=desc)
+            db.session.add(u_workflow_detail)
+            db.session.commit()
+            return ok('you')
     except Exception as e:
         return err(e.args())
 
@@ -188,3 +249,20 @@ def bokeh():
     p.line(x, y, legend="Temp.", line_width=2)
     show(p)
     return render_template('workflow.html')
+
+@app.route('/asyn/', methods=['GET'])
+def test_asyn_one():
+    print("asyn has a request!")
+    time.sleep(10)
+    return 'hello asyn'
+
+@app.route('/test/', methods=['GET'])
+def test():
+    def ssss():
+        print("ssss")
+        return "11111"
+    f=lambda x,y,z:x+y+z
+    print(f(1,2,3))
+    ff=lambda :ssss()
+    print(ff())
+    return 'hello test'

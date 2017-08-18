@@ -15,13 +15,20 @@ from sqlalchemy.orm import relationship
 
 from managesys import db, admin
 from ..moudel.util import generate_uuid
-from .models import User,Role
+from .models import User, Role
+
 Base = db.Model
 
 role_Workflow = db.Table('role_workflow',
                          Column('Workflow_id', ForeignKey('workflow.id'), primary_key=True),
                          Column('role_id', ForeignKey('role.id'), primary_key=True)
                          )
+
+
+class WorkflowComment(object):
+    Agree = 1
+    Refuse = 2
+    Abort = 3
 
 
 class Workflow(Base):
@@ -63,6 +70,7 @@ class WorkflowStep(Base):
     def get_role(self):
         obj = db.session.query(Role).get(self.role_id)
         return obj
+
     def __repr__(self):
         return u'<步骤表 {}>'.format(self.name)
 
@@ -72,22 +80,27 @@ class UserWorkflowInfo(Base):
     用户流程表,记录用户在使用流程
     '''
     id = Column(String(32), primary_key=True, default=generate_uuid)
+    # 创建用户
     user_id = Column(ForeignKey("user.id"))
-    # 当前处理用户
     user = relationship('User', foreign_keys='UserWorkflowInfo.user_id', backref='user_workflow_infos')
+    role_id = Column(ForeignKey("role.id"))
+    role = relationship('Role', foreign_keys='UserWorkflowInfo.role_id')
     workflow_id = Column(ForeignKey("workflow.id"))
-    workflow = relationship('Workflow', backref='user_workflow_infos')
+    u_workflow_info = relationship('Workflow', backref='user_workflow_infos')
     # 当前步骤
     step_id = Column(ForeignKey("workflow_step.id"))
     step = relationship('WorkflowStep')
     next_user_id = Column(ForeignKey("user.id"))
     next_user = relationship('User', foreign_keys='UserWorkflowInfo.next_user_id')
+    next_role_id = Column(ForeignKey("role.id"))
+    next_role = relationship('Role', foreign_keys='UserWorkflowInfo.next_role_id')
     is_finish = Column(Boolean, default=False)
     create_time = Column(DateTime, default=datetime.datetime.now())
 
     def get_next_user(self):
         obj = db.session.query(User).get(self.next_user_id)
         return obj
+
     def __repr__(self):
         return u'<用户流程记录表 {},{}>'.format(self.workflow.name, self.step.name)
 
